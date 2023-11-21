@@ -2,10 +2,9 @@ import argparse
 import datetime
 import pandas as pd
 from utils import perform_get_request, xml_to_load_dataframe, xml_to_gen_data
+import tqdm
 
 def get_load_data_from_entsoe(regions, periodStart='202302240000', periodEnd='202303240000', output_path='./data'):
-    
-    # TODO: There is a period range limit of 1 year for this API. Process in 1 year chunks if needed
     
     # URL of the RESTful API
     url = 'https://web-api.tp.entsoe.eu/api'
@@ -30,7 +29,7 @@ def get_load_data_from_entsoe(regions, periodStart='202302240000', periodEnd='20
         response_content = perform_get_request(url, params)
 
         # Response content is a string of XML data
-        df = xml_to_load_dataframe(response_content, 'Load')
+        df = xml_to_load_dataframe(response_content)
 
         # Save the DataFrame to a CSV file
         df.to_csv(f'{output_path}/load_{region}.csv', index=False)
@@ -55,21 +54,14 @@ def get_gen_data_from_entsoe(regions, periodStart='202302240000', periodEnd='202
         'periodEnd': periodEnd # in the format YYYYMMDDHHMM
     }
 
-    # Loop through the regions and get data for each region
     for region, area_code in regions.items():
         print(f'Fetching data for {region}...')
         params['outBiddingZone_Domain'] = area_code
         params['in_Domain'] = area_code
     
-        # Use the requests library to get data from the API for the specified time range
         response_content = perform_get_request(url, params)
-
-        # Response content is a string of XML data
         dfs = xml_to_gen_data(response_content)
-
-        # Save the dfs to CSV files
         for psr_type, df in dfs.items():
-            # Save the DataFrame to a CSV file
             df.to_csv(f'{output_path}/gen_{region}_{psr_type}.csv', index=False)
     
     return
@@ -80,19 +72,19 @@ def parse_arguments():
     parser.add_argument(
         '--start_time', 
         type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'), 
-        default=datetime.datetime(2023, 1, 1), 
+        default=datetime.datetime(2022, 1, 1), 
         help='Start time for the data to download, format: YYYY-MM-DD'
     )
     parser.add_argument(
         '--end_time', 
         type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'), 
-        default=datetime.datetime(2023, 1, 2), 
+        default=datetime.datetime(2023, 1, 1), 
         help='End time for the data to download, format: YYYY-MM-DD'
     )
     parser.add_argument(
         '--output_path', 
         type=str, 
-        default='./data',
+        default=r"..\data",
         help='Name of the output file'
     )
     return parser.parse_args()

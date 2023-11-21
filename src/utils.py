@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from datetime import datetime, timedelta
 
+
 def xml_to_gen_data(xml_data) -> dict:
     """
     Parse the XML data of generation into a dictionary of DataFrames, one for each PsrType.
@@ -68,7 +69,9 @@ def xml_to_gen_data(xml_data) -> dict:
     # Create a separate DataFrame for each PsrType
     df_dict = {psr_type: df[df["PsrType"] == psr_type] for psr_type in df["PsrType"].unique()}
     
+    
     return df_dict
+
 
 def xml_to_load_dataframe(xml_data) -> pd.DataFrame:
     """
