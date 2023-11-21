@@ -50,8 +50,10 @@ def save_predictions(predictions, predictions_file):
         json_data["target"][str(i)] = num
     print("predictions.json created")
     with open(predictions_file, 'w') as json_file:
-        json.dump(json_data, json_file, indent=2)
-    pass
+        json.dump(json_data, json_file, indent=4)
+    #this is for sumbition
+    with open("../predictions.json", 'w') as json_file:
+        json.dump(json_data, json_file, indent=4)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Prediction script for Energy Forecasting Hackathon')
